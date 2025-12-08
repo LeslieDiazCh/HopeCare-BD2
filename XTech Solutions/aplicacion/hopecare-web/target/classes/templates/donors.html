@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donors - HopeCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- ============================================================
+             SIDEBAR NAVIGATION
+             ============================================================ -->
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-heart"></i> HopeCare</h1>
+                <p>Donation Management</p>
+            </div>
+
+            <!-- USER INFO -->
+            <div style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); color: white;">
+                <div style="font-size: 0.9rem; margin-bottom: 0.25rem;">
+                    <i class="fas fa-user-circle"></i>
+                    <span th:text="${session.user != null ? session.user.fullName : 'User'}">System Administrator</span>
+                </div>
+                <div style="font-size: 0.8rem; opacity: 0.7;">
+                    <span th:text="${session.user != null ? session.user.roleName : 'Role'}">Administrator</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- DASHBOARD - TODOS -->
+                <a href="/hopecare/" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <!-- SOLO ADMIN -->
+                <th:block th:if="${session.user != null and session.user.roleName == 'Administrator'}">
+                    <a href="/hopecare/donors" class="nav-item">
+                        <i class="fas fa-hands-helping"></i>
+                        <span>Donors</span>
+                    </a>
+                    <a href="/hopecare/beneficiaries" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Beneficiaries</span>
+                    </a>
+                    <a href="/hopecare/programs" class="nav-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Programs</span>
+                    </a>
+                </th:block>
+
+                <!-- ADMIN Y ASSISTANT -->
+                <a href="/hopecare/donations" class="nav-item">
+                    <i class="fas fa-donate"></i>
+                    <span>Donations</span>
+                </a>
+                <a href="/hopecare/deliveries" class="nav-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Deliveries</span>
+                </a>
+
+                <!-- REPORTS - TODOS -->
+                <a href="/hopecare/reports" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports</span>
+                </a>
+
+                <!-- LOGOUT -->
+                <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <a href="/hopecare/logout" class="nav-item" style="color: #ef4444;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        </aside>
+
+        <!-- ============================================================
+             MAIN CONTENT
+             ============================================================ -->
+        <main class="main-content">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h2><i class="fas fa-hands-helping"></i> Donors Management</h2>
+                    <p>Manage and view all active donors</p>
+                </div>
+                <button class="btn btn-primary" onclick="openNewDonorModal()">
+                    <i class="fas fa-plus"></i> New Donor
+                </button>
+            </div>
+
+            <!-- Error/Success Messages -->
+            <div th:if="${error}" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <div id="successMessage" class="alert alert-success hidden">
+                <i class="fas fa-check-circle"></i>
+                <span id="successText"></span>
+            </div>
+
+            <!-- ============================================================
+                 DONORS TABLE
+                 ============================================================ -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3><i class="fas fa-list"></i> Active Donors</h3>
+                    <input type="text" class="search-box" id="searchBox" 
+                           placeholder="Search donors..." onkeyup="searchDonors()">
+                </div>
+                
+                <table id="donorsTable">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Total Donations</th>
+                            <th>Total Value (PEN)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="donor : ${donors}">
+                            <td th:text="${donor.donorCode}">DON001</td>
+                            <td th:text="${donor.fullName}">John Doe</td>
+                            <td>
+                                <span class="badge badge-success" 
+                                      th:classappend="${donor.donorType == 'CORPORATE' ? 'badge-warning' : (donor.donorType == 'GOVERNMENT' ? 'badge-danger' : 'badge-success')}"
+                                      th:text="${donor.donorType}">INDIVIDUAL</span>
+                            </td>
+                            <td th:text="${donor.email}">email@example.com</td>
+                            <td th:text="${donor.phone}">999999999</td>
+                            <td class="text-center" th:text="${donor.totalDonations ?: 0}">0</td>
+                            <td th:text="${#numbers.formatDecimal(donor.totalValuePen ?: 0, 0, 'COMMA', 2, 'POINT')}">0.00</td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;"
+                                        th:onclick="'viewDonor(' + ${donor.donorId} + ')'">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;"
+                                        th:onclick="'editDonor(' + ${donor.donorId} + ')'">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ============================================================
+         MODAL: NEW/EDIT DONOR
+         ============================================================ -->
+    <div class="modal-overlay" id="donorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-user-plus"></i> New Donor</h3>
+                <button class="modal-close" onclick="closeDonorModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="donorForm" onsubmit="saveDonor(event)">
+                    <input type="hidden" id="donorId">
+                    
+                    <div class="form-group">
+                        <label for="fullName"><i class="fas fa-user"></i> Full Name *</label>
+                        <input type="text" class="form-control" id="fullName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="donorType"><i class="fas fa-tag"></i> Donor Type *</label>
+                        <select class="form-control" id="donorType" required>
+                            <option value="">Select type...</option>
+                            <option value="INDIVIDUAL">Individual</option>
+                            <option value="CORPORATE">Corporate</option>
+                            <option value="GOVERNMENT">Government</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" class="form-control" id="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone"><i class="fas fa-phone"></i> Phone</label>
+                        <input type="text" class="form-control" id="phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address"><i class="fas fa-map-marker-alt"></i> Address</label>
+                        <textarea class="form-control" id="address" rows="3"></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeDonorModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         JAVASCRIPT
+         ============================================================ -->
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        // Open modal for new donor
+        function openNewDonorModal() {
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> New Donor';
+            document.getElementById('donorForm').reset();
+            document.getElementById('donorId').value = '';
+            openModal('donorModal');
+        }
+
+        // Close donor modal
+        function closeDonorModal() {
+            closeModal('donorModal');
+        }
+
+        // View donor details
+        async function viewDonor(id) {
+            try {
+                const donor = await apiRequest(`/hopecare/donors/api/${id}`);
+                alert(`Donor Details:\n\nCode: ${donor.donorCode}\nName: ${donor.fullName}\nType: ${donor.donorType}\nEmail: ${donor.email}\nPhone: ${donor.phone}\nTotal Donations: ${donor.totalDonations || 0}\nTotal Value: S/ ${(donor.totalValuePen || 0).toFixed(2)}`);
+            } catch (error) {
+                showAlert('Error loading donor details: ' + error.message, 'danger');
+            }
+        }
+
+        // Edit donor
+        async function editDonor(id) {
+            try {
+                const donor = await apiRequest(`/hopecare/donors/api/${id}`);
+                
+                document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Donor';
+                document.getElementById('donorId').value = donor.donorId;
+                document.getElementById('fullName').value = donor.fullName;
+                document.getElementById('donorType').value = donor.donorType;
+                document.getElementById('email').value = donor.email || '';
+                document.getElementById('phone').value = donor.phone || '';
+                document.getElementById('address').value = donor.address || '';
+                
+                openModal('donorModal');
+            } catch (error) {
+                showAlert('Error loading donor: ' + error.message, 'danger');
+            }
+        }
+
+        // Save donor (create or update)
+        async function saveDonor(event) {
+            event.preventDefault();
+            
+            const donorId = document.getElementById('donorId').value;
+            const data = {
+                donorId: donorId ? parseInt(donorId) : null,
+                fullName: document.getElementById('fullName').value,
+                donorType: document.getElementById('donorType').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            };
+
+            try {
+                const url = donorId ? '/hopecare/donors/api/update' : '/hopecare/donors/api/register';
+                const method = donorId ? 'PUT' : 'POST';
+                
+                const result = await apiRequest(url, method, data);
+                
+                showAlert(result.message, 'success');
+                closeDonorModal();
+                
+                // Reload page after 1 second
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+                
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        // Search donors
+        function searchDonors() {
+            const input = document.getElementById('searchBox').value.toUpperCase();
+            const table = document.getElementById('donorsTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+
+                for (let j = 0; j < cells.length - 1; j++) {
+                    const cell = cells[j];
+                    if (cell && cell.textContent.toUpperCase().indexOf(input) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                row.style.display = found ? '' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>

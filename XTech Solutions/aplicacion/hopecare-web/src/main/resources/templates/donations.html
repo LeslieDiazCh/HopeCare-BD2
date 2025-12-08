@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donations - HopeCare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-heart"></i> HopeCare</h1>
+                <p>Donation Management</p>
+            </div>
+
+            <!-- USER INFO -->
+            <div style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); color: white;">
+                <div style="font-size: 0.9rem; margin-bottom: 0.25rem;">
+                    <i class="fas fa-user-circle"></i>
+                    <span th:text="${session.user != null ? session.user.fullName : 'User'}">System Administrator</span>
+                </div>
+                <div style="font-size: 0.8rem; opacity: 0.7;">
+                    <span th:text="${session.user != null ? session.user.roleName : 'Role'}">Administrator</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- DASHBOARD - TODOS -->
+                <a href="/hopecare/" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <!-- SOLO ADMIN -->
+                <th:block th:if="${session.user != null and session.user.roleName == 'Administrator'}">
+                    <a href="/hopecare/donors" class="nav-item">
+                        <i class="fas fa-hands-helping"></i>
+                        <span>Donors</span>
+                    </a>
+                    <a href="/hopecare/beneficiaries" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Beneficiaries</span>
+                    </a>
+                    <a href="/hopecare/programs" class="nav-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Programs</span>
+                    </a>
+                </th:block>
+
+                <!-- ADMIN Y ASSISTANT -->
+                <a href="/hopecare/donations" class="nav-item">
+                    <i class="fas fa-donate"></i>
+                    <span>Donations</span>
+                </a>
+                <a href="/hopecare/deliveries" class="nav-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Deliveries</span>
+                </a>
+
+                <!-- REPORTS - TODOS -->
+                <a href="/hopecare/reports" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports</span>
+                </a>
+
+                <!-- LOGOUT -->
+                <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <a href="/hopecare/logout" class="nav-item" style="color: #ef4444;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        </aside>
+
+        <main class="main-content">
+            
+            <div class="page-header">
+                <div>
+                    <h2><i class="fas fa-donate"></i> Donations Management</h2>
+                    <p>Track and manage all donations</p>
+                </div>
+                <button class="btn btn-primary" onclick="openNewDonationModal()">
+                    <i class="fas fa-plus"></i> New Donation
+                </button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <div id="successMessage" class="alert alert-success hidden">
+                <i class="fas fa-check-circle"></i>
+                <span id="successText"></span>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3><i class="fas fa-list"></i> All Donations</h3>
+                    <input type="text" class="search-box" id="searchBox" 
+                           placeholder="Search donations..." onkeyup="searchDonations()">
+                </div>
+                
+                <table id="donationsTable">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Donor</th>
+                            <th>Type</th>
+                            <th>Amount/Product</th>
+                            <th>Currency</th>
+                            <th>Program</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="donation : ${donations}">
+                            <td th:text="${donation.donationCode}">DON001</td>
+                            <td th:text="${donation.donorName}">Donor</td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${donation.type == 'Monetary Donation' ? 'badge-success' : 'badge-warning'}"
+                                      th:text="${donation.type}">MONEY</span>
+                            </td>
+                            <td>
+                                <span th:if="${donation.amount}" th:text="${#numbers.formatDecimal(donation.amount, 0, 'COMMA', 2, 'POINT')}">1000.00</span>
+                                <span th:if="${donation.productDescription}" th:text="${donation.productDescription}">Product</span>
+                            </td>
+                            <td th:text="${donation.currency}">PEN</td>
+                            <td th:text="${donation.programName}">-</td>
+                            <td th:text="${donation.donationDate}">-</td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;"
+                                        th:onclick="'viewDonation(' + ${donation.donationId} + ')'">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(donations)}">
+                            <td colspan="8" style="text-align: center; padding: 2rem; color: #999;">
+                                <i class="fas fa-inbox"></i> No donations found
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        function openNewDonationModal() {
+            alert('New Donation feature coming soon!');
+        }
+
+        function viewDonation(id) {
+            alert('Donation ID: ' + id);
+        }
+
+        function searchDonations() {
+            const input = document.getElementById('searchBox').value.toUpperCase();
+            const table = document.getElementById('donationsTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+
+                for (let j = 0; j < cells.length - 1; j++) {
+                    const cell = cells[j];
+                    if (cell && cell.textContent.toUpperCase().indexOf(input) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                row.style.display = found ? '' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>
