@@ -48,11 +48,8 @@ XTECH_HOPECARE_FINAL/
 │
 ├── README.txt (este archivo)
 │
-├── 01_ENTREGABLES_ANTERIORES/
 │   ├── HC-DMS - Informe Entregable parcial 01.pdf
 │   └── HC-DMS - Informe Entregable parcial 02.pdf
-│
-├── 02_INFORMES_FINALES/
 │   ├── Informe_Ejecutivo_HopeCare.pdf
 │   └── Informe_Tecnico_HopeCare.pdf
 │
@@ -77,18 +74,10 @@ XTECH_HOPECARE_FINAL/
 │   ├── 12_TEST_OPERATIONS.sql
 │   ├── 13_SECURITY.sql
 │   └── 14_BACKUP.sql
-│
-├── 05_SCRIPTS_ADICIONALES/
 │   ├── Script_Transacciones.sql
 │   ├── Script_Concurrencia.sql
 │   ├── Script_Prevencion_SQL_Injection.sql
 │   ├── Script_Auditoria_BD.sql
-│   ├── README_Scripts.md
-│   └── RESULTADOS/
-│       ├── Resultado_Transacciones.txt
-│       ├── Resultado_Auditoria.txt
-│       ├── Captura_SQL_Injection.png
-│       └── Captura_Concurrencia.png
 │
 ├── 06_APLICACION/
 │   ├── pom.xml
@@ -118,9 +107,6 @@ XTECH_HOPECARE_FINAL/
 │       │           └── reports.html
 │       └── test/
 │
-├── 07_BACKUP/
-│   ├── HOPECARE_EXPORT.sql (o .dmp)
-│   └── EXPORT_LOG.txt
 │
 └── 08_CAPTURAS/
     ├── Dashboard.png
@@ -385,31 +371,5 @@ SOLUCIÓN DE PROBLEMAS:
    → Revisar en consola de Spring Boot si hay errores
    → Verificar que el puerto 8080 no está en uso
 
-================================================================================
-8. CONTACTO
-================================================================================
-
-Desarrolladora:
-  Leslie Diaz Chambi
-  Email: leslie.diaz@unmsm.edu.pe
-  Universidad Nacional Mayor de San Marcos
-
-Docente:
-  Jorge Luis Chávez Soto
-  Curso: Base de Datos II
-  UNMSM - FISI
-
-Consultora:
-  XTech Consulting
-  Email: contacto@xtech.com
-  Web: www.xtech.com (ficticio para el proyecto)
-
-================================================================================
-
-ÚLTIMA ACTUALIZACIÓN: Diciembre 2025
-VERSIÓN: 1.0 Final
-
-================================================================================
-                          GRACIAS POR UTILIZAR HOPECARE
-              Sistema de Gestión de Donaciones para Organizaciones Sociales
-================================================================================
+VIDEO DE PRESENTACIÓN:
+-----------------------
