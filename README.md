@@ -66,11 +66,14 @@ Acceder en: `http://localhost:8080/hopecare`
 ##  Estructura
 
 ```
-XTECH_HOPECARE_FINAL/
-├── 02_ENTREGABLES/         # Informes y documentación
-├── 03_MODELOS/             # Modelos de base de datos
-├── 04_SCRIPTS_BASE_DATOS/  # Scripts SQL y PL/SQL
-└── 06_APLICACION/          # Aplicación Spring Boot
+XTech Solutions/
+├── aplicacion/             # Aplicación Spring Boot
+├── modelos/                # Modelos de base de datos
+├── scripts/                # Scripts SQL y PL/SQL
+├── HC-DMS - Informe Ejecutivo.pdf
+├── HC-DMS - Informe Técnico.pdf
+├── HC-DMS - Informe Entregable p...
+└── README.md
 ```
 
 ##  Stack Tecnológico
