@@ -4,7 +4,7 @@ Sistema de gestión de donaciones para ONGs desarrollado con Oracle Database y S
 
 ## 📊 Video Demo
 
-[Ver presentación del sistema](https://drive.google.com/file/d/17RvjdU6bQF6RJbHb-gGwsOiBx_w5x8LU/view?usp=sharing)
+[Ver presentación del sistema](https://drive.google.com/file/d/1-ZTvzfGmnB2mH53411uRGmOJ3ee-zuDX/view?usp=sharing)
 
 ##  Características
 
